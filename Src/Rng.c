@@ -39,3 +39,8 @@ int getRandomNumber(){
 
 	return Rng->DR;
 }
+
+void getRandNumByIT(void){
+	Rng->CR |= RNG_IE;
+	Rng->CR |= RNG_RNGEN;
+}

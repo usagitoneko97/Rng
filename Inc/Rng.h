@@ -36,5 +36,5 @@ void generateRandomNumber();
 #define RNG_DRDY				(1)
 
 #define RNG_RNGEN				(1<<2)
-
+#define RNG_IE					(1<<3)
 #endif /* RNG_H_ */

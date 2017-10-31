@@ -42,6 +42,7 @@
 /* USER CODE BEGIN Includes */
 #include "Rng.h"
 #include "Rcc.h"
+#include "Nvic.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -93,6 +94,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   printf("hello world! \n");
   enableRcc();
+  nvicSetPrior(80, 3);
+  nvicEnableIrq(80);
+  getRandNumByIT();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -102,8 +106,9 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	  number = getRandomNumber();
-	  printf("random number : %x \n", number);
+//	  number = getRandomNumber();
+
+//	  printf("random number : %x \n", number);
   }
   /* USER CODE END 3 */
 
@@ -181,7 +186,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HASH_RNG_IRQHandler(void){
+	volatile int number = Rng->DR;
+	volatile int i;
+	i++;
+}
 /* USER CODE END 4 */
 
 /**
