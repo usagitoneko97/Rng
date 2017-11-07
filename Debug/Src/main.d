@@ -26,7 +26,11 @@ Src/main.o: ../Src/main.c C:/Students/HGX/stm32/RNG_2/Inc/main.h \
  C:/Students/HGX/stm32/RNG_2/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  C:/Students/HGX/stm32/RNG_2/Inc/Rng.h \
  C:/Students/HGX/stm32/RNG_2/Inc/Rcc.h \
- C:/Students/HGX/stm32/RNG_2/Inc/Nvic.h
+ C:/Students/HGX/stm32/RNG_2/Inc/Nvic.h \
+ C:/Students/HGX/stm32/RNG_2/Inc/SysTick.h \
+ C:/Students/HGX/stm32/RNG_2/Inc/Gpio.h \
+ C:/Students/HGX/stm32/RNG_2/Inc/Exti.h \
+ C:/Students/HGX/stm32/RNG_2/Inc/SysCfg.h
 
 C:/Students/HGX/stm32/RNG_2/Inc/main.h:
 
@@ -85,3 +89,11 @@ C:/Students/HGX/stm32/RNG_2/Inc/Rng.h:
 C:/Students/HGX/stm32/RNG_2/Inc/Rcc.h:
 
 C:/Students/HGX/stm32/RNG_2/Inc/Nvic.h:
+
+C:/Students/HGX/stm32/RNG_2/Inc/SysTick.h:
+
+C:/Students/HGX/stm32/RNG_2/Inc/Gpio.h:
+
+C:/Students/HGX/stm32/RNG_2/Inc/Exti.h:
+
+C:/Students/HGX/stm32/RNG_2/Inc/SysCfg.h:

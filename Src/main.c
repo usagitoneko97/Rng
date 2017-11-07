@@ -43,6 +43,10 @@
 #include "Rng.h"
 #include "Rcc.h"
 #include "Nvic.h"
+#include "SysTick.h"
+#include "Gpio.h"
+#include "Exti.h"
+#include "SysCfg.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -50,6 +54,8 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
  uint32_t number;
+ int count = 0;
+ int flag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,7 +75,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	initialise_monitor_handles();
+//	initialise_monitor_handles();
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -92,11 +98,33 @@ int main(void)
   MX_GPIO_Init();
 
   /* USER CODE BEGIN 2 */
-  printf("hello world! \n");
+//  printf("hello world! \n");
   enableRcc();
-  nvicSetPrior(80, 3);
-  nvicEnableIrq(80);
-  getRandNumByIT();
+  enableGpioA();
+  enableSysCfg();
+  //enable exti0 nvic interrupt
+  nvicEnableIrq(6);
+//  nvicSetPrior(80, 3);
+//  nvicEnableIrq(80);
+
+//  EXTI_CLEAR_IT_MASK(0);
+  EXTI_CLEAR_IT_MASK(0);
+  EXTI_SELECT_RISE_TRIG(0);
+  EXTI_CLEAR_FALL_TRIG(0);
+  SET_EXTICR1(PA0_EXTI_CFG);
+//  getRandNumByIT();
+  /*sysTickPrescaleSpeed();
+  sysTickSetReload(1125000);
+  sysTickClearCounter();*/
+//  sysTickItDisable();
+  sysTickDisable();
+
+  gpioConfig(GpioA, 8, GPIO_MODE_AF, GPIO_PUSH_PULL, GPIO_NOPULL, GPIO_L_SPEED);
+  setGpioAlternateFunc(GpioA, 8, 0);
+  MCO_CLK_SELECT(MC0_HSE_SRC);
+  MCO_PRESCALE(MC0_DIV_2);
+  volatile int i;
+  i++;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,6 +134,31 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+//	  __WFI();
+//	  __WFI();
+//	  HAL_GPIO_WritePin(redLed_GPIO_Port, redLed_Pin, GPIO_PIN_SET);
+//	  volatile int i;
+//	  i++;
+	  /*if(flag){
+		  flag = 0;
+		  EXTI_SET_IT_MASK(0);
+		  volatile int i, j;
+		  for(i = 0 ; i<10000000 ; i++){
+			  //for(j = 0 ; j < 999999999 ; j++);
+		  }
+		  EXTI_CLEAR_IT_MASK(0);
+	  }*/
+//	  __WFI();
+//	  volatile int i;
+//	  HAL_GPIO_TogglePin(redLed_GPIO_Port, redLed_Pin);
+//	  i++;
+//	  SysTick->CTRL = 1;
+	 /* while(sysTickHasExpired() == 0){
+	  }*/
+//	  HAL_GPIO_TogglePin(redLed_GPIO_Port, redLed_Pin);
+//	  sysTickClearCounter();
+//	  sysTickEnable();
+
 //	  number = getRandomNumber();
 
 //	  printf("random number : %x \n", number);
@@ -126,20 +179,26 @@ void SystemClock_Config(void)
     */
   __HAL_RCC_PWR_CLK_ENABLE();
 
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = 16;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 365;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV6;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 15;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+    /**Activate the Over-Drive mode 
+    */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -150,10 +209,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -180,8 +239,21 @@ void SystemClock_Config(void)
 static void MX_GPIO_Init(void)
 {
 
+  GPIO_InitTypeDef GPIO_InitStruct;
+
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(redLed_GPIO_Port, redLed_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : redLed_Pin */
+  GPIO_InitStruct.Pin = redLed_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(redLed_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -190,6 +262,17 @@ void HASH_RNG_IRQHandler(void){
 	volatile int number = Rng->DR;
 	volatile int i;
 	i++;
+}
+void My_SysTick_Handler(void){
+	//just do nithing, but reading the CTRL register to clera the countFlag
+	volatile int flags = SysTickTimer->CTRL;
+	HAL_GPIO_TogglePin(redLed_GPIO_Port, redLed_Pin);
+}
+
+void EXTI0_IRQHandler(void){
+	count++;
+	EXTI_CLEAR_PENDING_R(0);
+	flag = 1;
 }
 /* USER CODE END 4 */
 

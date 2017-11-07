@@ -49,6 +49,25 @@ struct RccReg{
 	volatile uint32_t SSCGR;
 	volatile uint32_t PLLI2SCFGR;
 };
+#define MC0_HSI_SRC		0
+#define MC0_LSE_SRC		1
+#define MC0_HSE_SRC		2
+#define MC0_PLL_SRC		3
+
+#define MC0_NO_DIV		0
+#define MC0_DIV_2		4
+#define MC0_DIV_3		5
+#define MC0_DIV_4		6
+#define MC0_DIV_5		7
+
+#define MCO_CLK_SELECT(x)	(Rcc->CFGR &= ~(3 << 21));	\
+							(Rcc->CFGR |= (x << 22))
+
+#define MCO_PRESCALE(x)		(Rcc->CFGR &= ~(7 << 24));	\
+							(Rcc->CFGR |= (x << 24))	\
 
 void enableRcc(void);
+void enableGpioA(void);
+void enableGpioG(void);
+void enableSysCfg(void);
 #endif /* RCC_H_ */

@@ -33,10 +33,11 @@ void gpioConfig(GpioReg *gpio, int pin, int mode, int outDriveType, int pullType
 	gpio->mode |= (mode<<(pin*2));
 	//*gpioGMode = 0xff;
 
-	gpio->outSpeed   &= ~(3<<(pin*2)); //clear the pin speed
+	gpio->outSpeed  &= ~(3<<(pin*2)); //clear the pin speed
 	gpio->outSpeed  |= speed<<(pin*2); //set the pin speed
 
-	gpio->pullType = ~(pullType<<(pin*2)); //set the pupd
+	gpio->pullType &= ~(3<<(pin*2)); //clear to 0
+	gpio->pullType |= (pullType<<(pin*2)); //set the pupd
 
 	gpio->outType |= (outDriveType<<pin);
 
@@ -76,6 +77,15 @@ void gpioWrite(GpioReg *gpio, int pin, int state){
 	else{
 		gpio->outData &= ~(1<<pin);
 	}
+}
+
+void setGpioAlternateFunc(GpioReg *gpio, int pin, int altFunc){
+
+	if(pin > 7)
+		gpio->altFuncLo = (altFunc << (pin * 4));
+	else
+		gpio->altFuncHi = (altFunc << (pin * 4));
+//	gpio->pullType &= ~(3 << (pin *2));
 }
 
 

@@ -46,6 +46,9 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define redLed_Pin GPIO_PIN_14
+#define redLed_GPIO_Port GPIOG
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
